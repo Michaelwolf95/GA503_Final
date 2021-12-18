@@ -47,11 +47,15 @@ public class EnemyController : MonoBehaviour
 
 	private void Aggro()
 	{
-		isAggrod = true;
+		animator.Play("Aggro");
 		sfxSource.PlayOneShot(aggroSound);
-		currentSpeed = initialSpeed;
+		this.InvokeAction((() =>
+		{
+			isAggrod = true;
+			currentSpeed = initialSpeed;
+		}), 0.15f);
 	}
-	
+
 	public void Kill()
 	{
 		isDead = true;

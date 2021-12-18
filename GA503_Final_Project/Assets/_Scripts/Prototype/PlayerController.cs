@@ -8,12 +8,15 @@ using UnityEngine.SceneManagement;
 public class PlayerController : MonoBehaviour
 {
     public static PlayerController Instance = null;
+
+    public static int startTrackWaypointIndex = 0;
     
     [SerializeField] private Animator playerAnimator;
     [SerializeField] private Rigidbody _rigidbody;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Animator cameraStateAnimator;
     [SerializeField] private CinemachineDollyCart dollyCart;
+    [SerializeField] private CinemachineSmoothPath dollyTrack;
     
     [Space]
     [SerializeField] private float forwardDefaultMoveSpeed = 5f;
@@ -72,6 +75,12 @@ public class PlayerController : MonoBehaviour
         {
             mainCamera = Camera.main;
         }
+
+
+        transform.position = dollyTrack.m_Waypoints[startTrackWaypointIndex].position;
+        // dollyTrack.StandardizePathDistance()
+        // m_Path.StandardizeUnit(distanceAlongPath, m_PositionUnits);
+        // dollyCart.m_Position  = dollyTrack. dollyTrack.m_Waypoints[startTrackWaypointIndex].position;
         
         dollyCart.m_Speed = forwardDefaultMoveSpeed;
         currentDollyTrackSpeed = dollyCart.m_Speed;
