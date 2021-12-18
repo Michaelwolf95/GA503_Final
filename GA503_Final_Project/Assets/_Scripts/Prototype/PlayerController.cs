@@ -145,7 +145,7 @@ public class PlayerController : MonoBehaviour
         Vector3 dollyDistFromCam = Vector3.Project(dollyTransform.position - mainCamera.transform.position, mainCamera.transform.forward);
         if (dollyDistFromCam.magnitude + 0.5f < distFromCam.magnitude)
         {
-            currSpeed = 0f;
+            currSpeed -= 1f;
         }
         
         Vector3 forwardVelocity = currSpeed * dollyTransform.forward;
