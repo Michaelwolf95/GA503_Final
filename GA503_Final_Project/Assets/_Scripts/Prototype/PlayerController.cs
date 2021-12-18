@@ -33,7 +33,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float lateralMaxMoveSpeed = 3f;
     
     [Space]
-    [SerializeField] private Animator puleEffectAnimator;
+    [SerializeField] private Animator pulseEffectAnimator;
+    [SerializeField] private GameObject pulseChargeIndicator = null;
     [SerializeField] private float pulseCooldownDuration = 0.4f;
 
     [Space] 
@@ -41,6 +42,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip boostSound;
     [SerializeField] private AudioClip pulseSound;
     [SerializeField] private AudioClip deathSound;
+
+    private bool isCharging = false;
 
     //private Vector3 velocity = Vector3.zero;
 
@@ -100,15 +103,17 @@ public class PlayerController : MonoBehaviour
         }
         
         // Play pulse
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButton("Fire1"))
+        {
+           StartPulseCharge();
+        }
+        else if (Input.GetButtonUp("Fire1"))
         {
             PulseAttack();
         }
         
         lateralMoveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         //isBoosting = Input.GetButton("Fire3");
-
-        
 
 
         if (isBoosting)
@@ -225,6 +230,7 @@ public class PlayerController : MonoBehaviour
         isPlayerDead = true;
         isPlayerMoving = false;
         pulseAvailable = false;
+        isCharging = false;
         
         playerAnimator.Play("Death");
         sfxSource.PlayOneShot(deathSound);
@@ -234,12 +240,23 @@ public class PlayerController : MonoBehaviour
         GameManager.Instance.ResetLevel();
     }
 
+    private void StartPulseCharge()
+    {
+        if (pulseAvailable && !isPlayerDead && !isCharging)
+        {
+            pulseChargeIndicator.gameObject.SetActive(true);
+            isCharging = true;
+        }
+    }
+
     private void PulseAttack()
     {
-        if (pulseAvailable && !isPlayerDead)
+        if (pulseAvailable && !isPlayerDead && isCharging)
         {
+            isCharging = false;
+            pulseChargeIndicator.gameObject.SetActive(false);
             trailRenderer.gameObject.SetActive(false);
-            puleEffectAnimator.Play("Pulse");
+            pulseEffectAnimator.Play("Pulse");
             pulseAvailable = false;
             this.InvokeAction((() =>
             {

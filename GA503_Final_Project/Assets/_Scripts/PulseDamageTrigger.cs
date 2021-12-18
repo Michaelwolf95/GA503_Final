@@ -10,8 +10,9 @@ public class PulseDamageTrigger : MonoBehaviour
 		if (!other.isTrigger && other.attachedRigidbody && other.attachedRigidbody.CompareTag("Enemy"))
 		{
 			EnemyController enemyController = other.attachedRigidbody.GetComponent<EnemyController>();
+			Rigidbody rb = other.attachedRigidbody;
 			enemyController?.Kill();
-			other.attachedRigidbody.AddExplosionForce(explosionForce, this.transform.position, this.transform.localScale.x * 2f);
+			rb.AddExplosionForce(explosionForce, this.transform.position, this.transform.localScale.x * 2f, 0f, ForceMode.Impulse);
 		}
 	}
 }

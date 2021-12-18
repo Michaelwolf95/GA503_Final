@@ -19,12 +19,16 @@ public class EnemyController : MonoBehaviour
 	private bool isDead = false;
 	private float currentSpeed = 0f;
 
+	private Collider[] colliders;
+
 	private void Awake()
 	{
 		isDead = false;
 		isAggrod = false;
 		_rigidbody.useGravity = false;
 		_rigidbody.isKinematic = true;
+
+		colliders = gameObject.GetComponentsInChildren<Collider>();
 	}
 
 	private void Update()
@@ -66,6 +70,11 @@ public class EnemyController : MonoBehaviour
 		
 		sfxSource.PlayOneShot(deathSound);
 		triggerIndicator.gameObject.SetActive(false);
+		
+		foreach (Collider col in colliders)
+		{
+			col.enabled = false;
+		}
 		
 		// this.InvokeAction((() =>
 		// {
