@@ -56,15 +56,15 @@ MonoBehaviour:
   mainCamera: {fileID: 0}
   cameraStateAnimator: {fileID: 0}
   dollyCart: {fileID: 0}
+  forwardDefaultMoveSpeed: 10
+  forwardBoostMoveSpeed: 16
+  forwardMoveAcceleration: 20
+  forwardMoveDeceleration: 15
   lateralMoveAcceleration: 30
   lateralBreakDeceleration: 30
   lateralMaxMoveSpeed: 10
-  forwardDefaultMoveSpeed: 7
-  forwardBoostMoveSpeed: 10
-  forwardMoveAcceleration: 20
-  forwardMoveDeceleration: 15
   puleEffectAnimator: {fileID: 3624588048273621823}
-  pulseCooldownDuration: 1
+  pulseCooldownDuration: 1.5
   sfxSource: {fileID: 3624588047344196526}
   boostSound: {fileID: 8300000, guid: 616af0820b32c4f4480a423ff1f02b95, type: 3}
   pulseSound: {fileID: 8300000, guid: a68acb39518cdae44a7b59265319699c, type: 3}

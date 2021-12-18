@@ -5751,9 +5751,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 17cb0c06fbb84dd4a36e0435503cac08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialSpeed: 5.5
-  acceleration: 0.8
-  maxSpeed: 9
+  initialSpeed: 8.5
+  acceleration: 0.75
+  maxSpeed: 12
   _rigidbody: {fileID: 7297158759597092593}
   animator: {fileID: 160451205438476759}
   sfxSource: {fileID: 4889903615009254016}

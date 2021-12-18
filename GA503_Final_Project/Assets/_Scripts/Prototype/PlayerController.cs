@@ -16,15 +16,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private CinemachineDollyCart dollyCart;
     
     [Space]
-    [SerializeField] private float lateralMoveAcceleration = 3f;
-    [SerializeField] private float lateralBreakDeceleration = 3f;
-    [SerializeField] private float lateralMaxMoveSpeed = 3f;
-    
     [SerializeField] private float forwardDefaultMoveSpeed = 5f;
     [SerializeField] private float forwardBoostMoveSpeed = 8f;
     
     [SerializeField] private float forwardMoveAcceleration = 10f;
     [SerializeField] private float forwardMoveDeceleration = 5f;
+    
+    [Space]
+    [SerializeField] private float lateralMoveAcceleration = 3f;
+    [SerializeField] private float lateralBreakDeceleration = 3f;
+    [SerializeField] private float lateralMaxMoveSpeed = 3f;
     
     [Space]
     [SerializeField] private Animator puleEffectAnimator;
@@ -140,15 +141,16 @@ public class PlayerController : MonoBehaviour
         //Vector3 forwardVelocity = dollyCart.m_Speed * dollyTransform.forward;
 
         float currSpeed = Mathf.Min(currentDollyPositionSpeed, dollyCart.m_Speed);
-        
-        Vector3 distFromCam = Vector3.Project(transform.position - mainCamera.transform.position, mainCamera.transform.forward);
-        Vector3 dollyDistFromCam = Vector3.Project(dollyTransform.position - mainCamera.transform.position, mainCamera.transform.forward);
-        if (dollyDistFromCam.magnitude + 0.5f < distFromCam.magnitude)
+        Vector3 toDolly = transform.position - dollyTransform.position;
+        if (Vector3.Dot(toDolly, dollyTransform.forward) > 0f)
         {
-            currSpeed -= 1f;
+            currSpeed = Mathf.Max(currSpeed - 1f, 0f);
+            //Debug.Log(currSpeed);
         }
-        
+
         Vector3 forwardVelocity = currSpeed * dollyTransform.forward;
+        
+        
         
         _rigidbody.velocity = lateralVelocity + forwardVelocity;
         
