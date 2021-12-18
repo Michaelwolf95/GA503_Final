@@ -9,7 +9,7 @@ Shader "Unlit/UnlitTransparentColor"
     {
         Tags {"Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent"}
         
-        //ZWrite Off
+        ZWrite On
         Lighting Off
         Fog { Mode Off }
 
@@ -54,11 +54,10 @@ Shader "Unlit/UnlitTransparentColor"
             fixed4 frag (v2f i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
+                fixed4 col = tex2D(_MainTex, i.uv) * _Color;
                 // apply fog
                 UNITY_APPLY_FOG(i.fogCoord, col);
-                
-                col *= _Color;
+ 
                 return col * col.a;
             }
             ENDCG

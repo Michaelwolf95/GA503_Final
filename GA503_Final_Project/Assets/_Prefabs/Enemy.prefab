@@ -5756,6 +5756,7 @@ MonoBehaviour:
   maxSpeed: 12
   _rigidbody: {fileID: 7297158759597092593}
   animator: {fileID: 160451205438476759}
+  triggerIndicator: {fileID: 7297158758913131547}
   sfxSource: {fileID: 4889903615009254016}
   aggroSound: {fileID: 8300000, guid: 4fb135d3c45ee7343ba34122f8adc35f, type: 3}
   deathSound: {fileID: 8300000, guid: 7babb37708f99c340a139a86739281d3, type: 3}

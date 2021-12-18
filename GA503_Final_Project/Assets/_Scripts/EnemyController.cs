@@ -8,6 +8,7 @@ public class EnemyController : MonoBehaviour
 	[SerializeField] private float maxSpeed = 10f;
 	[SerializeField] private Rigidbody _rigidbody;
 	[SerializeField] private Animator animator;
+	[SerializeField] private GameObject triggerIndicator;
 	
 	[Space] 
 	[SerializeField] private AudioSource sfxSource;
@@ -54,6 +55,7 @@ public class EnemyController : MonoBehaviour
 			isAggrod = true;
 			currentSpeed = initialSpeed;
 		}), 0.15f);
+		triggerIndicator.gameObject.SetActive(false);
 	}
 
 	public void Kill()
@@ -63,6 +65,7 @@ public class EnemyController : MonoBehaviour
 		_rigidbody.isKinematic = false;
 		
 		sfxSource.PlayOneShot(deathSound);
+		triggerIndicator.gameObject.SetActive(false);
 		
 		// this.InvokeAction((() =>
 		// {

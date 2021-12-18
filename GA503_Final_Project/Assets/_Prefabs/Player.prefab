@@ -53,9 +53,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerAnimator: {fileID: 3624588047344196527}
   _rigidbody: {fileID: 3624588047344196531}
+  trailRenderer: {fileID: 3624588048252768274}
   mainCamera: {fileID: 0}
   cameraStateAnimator: {fileID: 0}
   dollyCart: {fileID: 0}
+  dollyTrack: {fileID: 0}
   forwardDefaultMoveSpeed: 10
   forwardBoostMoveSpeed: 16
   forwardMoveAcceleration: 20

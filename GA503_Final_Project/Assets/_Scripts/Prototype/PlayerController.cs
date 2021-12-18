@@ -13,6 +13,8 @@ public class PlayerController : MonoBehaviour
     
     [SerializeField] private Animator playerAnimator;
     [SerializeField] private Rigidbody _rigidbody;
+    [SerializeField] private TrailRenderer trailRenderer;
+    [Space]
     [SerializeField] private Camera mainCamera;
     [SerializeField] private Animator cameraStateAnimator;
     [SerializeField] private CinemachineDollyCart dollyCart;
@@ -46,6 +48,8 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 lateralMoveInput;
     private bool isBoosting = false;
+
+    private float boostTimer = 0f;
 
     private float currentDollyTrackSpeed = 0f;
     private float currentDollyPositionSpeed = 0f;
@@ -104,7 +108,17 @@ public class PlayerController : MonoBehaviour
         lateralMoveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         //isBoosting = Input.GetButton("Fire3");
 
-        cameraStateAnimator.SetBool("IsZoomedOut", isBoosting);
+        
+
+
+        if (isBoosting)
+        {
+            boostTimer -= Time.deltaTime;
+            if (boostTimer <= 0f)
+            {
+                EndBoost();
+            }
+        }
         
         float forwardAccel = (isBoosting ? forwardMoveAcceleration : -forwardMoveDeceleration);
         Vector3 prevForwardVelocity = Vector3.Project(_rigidbody.velocity, dollyTransform.forward);
@@ -183,13 +197,22 @@ public class PlayerController : MonoBehaviour
         if (!isPlayerDead)
         {
             isBoosting = true;
-            this.InvokeAction((() =>
-            {
-                isBoosting = false;
-            }), argDuration);
+            // this.InvokeAction((() =>
+            // {
+            //     isBoosting = false;
+            // }), argDuration);
+            boostTimer += argDuration;
             
             sfxSource.PlayOneShot(boostSound);
+            cameraStateAnimator.SetBool("IsZoomedOut", true);
         }
+    }
+    
+    public void EndBoost()
+    {
+        boostTimer = 0f;
+        isBoosting = false;
+        cameraStateAnimator.SetBool("IsZoomedOut", false);
     }
 
     public void KillPlayer()
@@ -215,10 +238,12 @@ public class PlayerController : MonoBehaviour
     {
         if (pulseAvailable && !isPlayerDead)
         {
+            trailRenderer.gameObject.SetActive(false);
             puleEffectAnimator.Play("Pulse");
             pulseAvailable = false;
             this.InvokeAction((() =>
             {
+                trailRenderer.gameObject.SetActive(true);
                 pulseAvailable = true;
             }), pulseCooldownDuration);
             sfxSource.PlayOneShot(pulseSound);
