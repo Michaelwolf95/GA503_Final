@@ -59,6 +59,11 @@ public class EnemyController : MonoBehaviour
 		_rigidbody.isKinematic = false;
 		
 		sfxSource.PlayOneShot(deathSound);
+		
+		// this.InvokeAction((() =>
+		// {
+		// 	this.gameObject.SetActive(false);
+		// }), 35f/60f);
 	}
 	
 }

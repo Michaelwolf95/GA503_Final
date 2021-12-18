@@ -7,7 +7,7 @@ public class PulseDamageTrigger : MonoBehaviour
 	
 	private void OnTriggerEnter(Collider other)
 	{
-		if (other.attachedRigidbody && other.attachedRigidbody.CompareTag("Enemy"))
+		if (!other.isTrigger && other.attachedRigidbody && other.attachedRigidbody.CompareTag("Enemy"))
 		{
 			EnemyController enemyController = other.attachedRigidbody.GetComponent<EnemyController>();
 			enemyController?.Kill();

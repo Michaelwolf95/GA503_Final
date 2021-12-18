@@ -159,13 +159,16 @@ public class PlayerController : MonoBehaviour
 
     public void StartBoost(float argDuration)
     {
-        isBoosting = true;
-        this.InvokeAction((() =>
+        if (!isPlayerDead)
         {
-            isBoosting = false;
-        }), argDuration);
-        
-        sfxSource.PlayOneShot(boostSound);
+            isBoosting = true;
+            this.InvokeAction((() =>
+            {
+                isBoosting = false;
+            }), argDuration);
+            
+            sfxSource.PlayOneShot(boostSound);
+        }
     }
 
     public void KillPlayer()
@@ -189,7 +192,7 @@ public class PlayerController : MonoBehaviour
 
     private void PulseAttack()
     {
-        if (pulseAvailable)
+        if (pulseAvailable && !isPlayerDead)
         {
             puleEffectAnimator.Play("Pulse");
             pulseAvailable = false;
