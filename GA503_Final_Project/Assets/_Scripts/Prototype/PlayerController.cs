@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Cinemachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,6 +11,11 @@ public class PlayerController : MonoBehaviour
     
     [SerializeField] private Animator playerAnimator;
     [SerializeField] private Rigidbody _rigidbody;
+    [SerializeField] private Camera mainCamera;
+    [SerializeField] private Animator cameraStateAnimator;
+    [SerializeField] private CinemachineDollyCart dollyCart;
+    
+    [Space]
     [SerializeField] private float lateralMoveAcceleration = 3f;
     [SerializeField] private float lateralBreakDeceleration = 3f;
     [SerializeField] private float lateralMaxMoveSpeed = 3f;
@@ -19,14 +25,16 @@ public class PlayerController : MonoBehaviour
     
     [SerializeField] private float forwardMoveAcceleration = 10f;
     [SerializeField] private float forwardMoveDeceleration = 5f;
-    [SerializeField] private float forwardMaxMoveSpeed = 10f;
     
-    [SerializeField] private Camera mainCamera;
-    [SerializeField] private Animator cameraStateAnimator;
-    [SerializeField] private CinemachineDollyCart dollyCart;
-
     [Space]
     [SerializeField] private Animator puleEffectAnimator;
+    [SerializeField] private float pulseCooldownDuration = 0.4f;
+
+    [Space] 
+    [SerializeField] private AudioSource sfxSource;
+    [SerializeField] private AudioClip boostSound;
+    [SerializeField] private AudioClip pulseSound;
+    [SerializeField] private AudioClip deathSound;
 
     //private Vector3 velocity = Vector3.zero;
 
@@ -38,12 +46,23 @@ public class PlayerController : MonoBehaviour
     private float currentDollyTrackSpeed = 0f;
     private float currentDollyPositionSpeed = 0f;
     private Vector3 lastDollyFixedUpdatePos = Vector3.zero;
+    
 
+    public bool isPlayerDead { get; private set; }
     private bool isPlayerMoving = false;
+    private bool pulseAvailable = false;
 
     private void Awake()
     {
         Instance = this;
+    }
+    
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     private void Start()
@@ -56,11 +75,6 @@ public class PlayerController : MonoBehaviour
         dollyCart.m_Speed = forwardDefaultMoveSpeed;
         currentDollyTrackSpeed = dollyCart.m_Speed;
         lastDollyFixedUpdatePos = dollyTransform.position;
-        
-        this.InvokeAction((() =>
-        {
-            isPlayerMoving = true;
-        }), 0.8f);
     }
 
     private void Update()
@@ -74,7 +88,7 @@ public class PlayerController : MonoBehaviour
         // Play pulse
         if (Input.GetButtonDown("Fire1"))
         {
-            
+            PulseAttack();
         }
         
         lateralMoveInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
@@ -90,19 +104,8 @@ public class PlayerController : MonoBehaviour
         }
         currentDollyTrackSpeed = Mathf.Clamp(currentDollyTrackSpeed + forwardAccel * Time.deltaTime, forwardDefaultMoveSpeed, forwardBoostMoveSpeed);
         dollyCart.m_Speed = currentDollyTrackSpeed;
-        
-        
     }
-
-    private void LateUpdate()
-    {
-        // lateralMoveInput = Vector2.zero;
-        // boostPressed = false;
-
-        //Vector3 currPos = transform.position;
-        //transform.position = currPos;
-    }
-
+    
     private void FixedUpdate()
     {
         Vector3 currDollyFixedUpdatePos = dollyTransform.position;
@@ -125,17 +128,6 @@ public class PlayerController : MonoBehaviour
             lateralMove = -prevLateralVelocity.normalized * lateralBreakDeceleration * Time.fixedDeltaTime;
         }
         _rigidbody.AddForce(lateralMove, ForceMode.Impulse);
-        /*
-        float forwardAccel = (boostPressed ? forwardMoveAcceleration : -forwardMoveDeceleration);
-        Vector3 prevForwardVelocity = Vector3.Project(_rigidbody.velocity, dollyTransform.forward);
-        if (!boostPressed && prevForwardVelocity.sqrMagnitude < 0.1f)
-        {
-            forwardAccel = 0f;
-        }
-        Vector3 forwardMove = dollyTransform.forward * (forwardAccel) * Time.fixedDeltaTime;
-        
-        //_rigidbody.AddForce(lateralMove + forwardMove, ForceMode.Impulse);
-        */
 
         Vector3 lateralVelocity = Vector3.ProjectOnPlane(_rigidbody.velocity, dollyTransform.forward);
         if (lateralVelocity.sqrMagnitude > Mathf.Pow(lateralMaxMoveSpeed, 2))
@@ -143,15 +135,6 @@ public class PlayerController : MonoBehaviour
             lateralVelocity = lateralVelocity.normalized * lateralMaxMoveSpeed;
         }
 
-        /*
-        Vector3 forwardVelocity = Vector3.Project(_rigidbody.velocity, dollyTransform.forward);
-        if (forwardVelocity.sqrMagnitude > Mathf.Pow(forwardMaxMoveSpeed, 2))
-        {
-            forwardVelocity = forwardVelocity.normalized * forwardMaxMoveSpeed;
-        }
-        */
-        
-        
         currentDollyPositionSpeed = (currDollyFixedUpdatePos - lastDollyFixedUpdatePos).magnitude / Time.fixedDeltaTime;
         Vector3 forwardVelocity = currentDollyPositionSpeed * dollyTransform.forward;
         
@@ -162,6 +145,18 @@ public class PlayerController : MonoBehaviour
         lastDollyFixedUpdatePos = currDollyFixedUpdatePos;
     }
 
+    public void OnLevelStart()
+    {
+        isPlayerMoving = true;
+        pulseAvailable = true;
+    }
+    
+    public void OnLevelCompleted()
+    {
+        isPlayerMoving = false;
+        pulseAvailable = false;
+    }
+
     public void StartBoost(float argDuration)
     {
         isBoosting = true;
@@ -169,11 +164,41 @@ public class PlayerController : MonoBehaviour
         {
             isBoosting = false;
         }), argDuration);
+        
+        sfxSource.PlayOneShot(boostSound);
     }
 
     public void KillPlayer()
     {
+        if (isPlayerDead)
+        {
+            return;
+        }
+        
+        isPlayerDead = true;
         isPlayerMoving = false;
+        pulseAvailable = false;
+        
+        playerAnimator.Play("Death");
+        sfxSource.PlayOneShot(deathSound);
+
+        dollyCart.m_Speed = 0f;
+
+        GameManager.Instance.ResetLevel();
+    }
+
+    private void PulseAttack()
+    {
+        if (pulseAvailable)
+        {
+            puleEffectAnimator.Play("Pulse");
+            pulseAvailable = false;
+            this.InvokeAction((() =>
+            {
+                pulseAvailable = true;
+            }), pulseCooldownDuration);
+            sfxSource.PlayOneShot(pulseSound);
+        }
     }
 
     private void OnCollisionEnter(Collision other)
