@@ -136,9 +136,12 @@ public class PlayerController : MonoBehaviour
         }
 
         currentDollyPositionSpeed = (currDollyFixedUpdatePos - lastDollyFixedUpdatePos).magnitude / Time.fixedDeltaTime;
-        Vector3 forwardVelocity = currentDollyPositionSpeed * dollyTransform.forward;
+        //Vector3 forwardVelocity = currentDollyPositionSpeed * dollyTransform.forward;
         
         //Vector3 forwardVelocity = dollyCart.m_Speed * dollyTransform.forward;
+        
+        
+        Vector3 forwardVelocity = Mathf.Min(currentDollyPositionSpeed, dollyCart.m_Speed) * dollyTransform.forward;
         
         _rigidbody.velocity = lateralVelocity + forwardVelocity;
         
