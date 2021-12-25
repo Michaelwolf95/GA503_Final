@@ -66,6 +66,8 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         Instance = this;
+        dollyCart.m_Speed = 0f;
+        _rigidbody.isKinematic = true;
     }
     
     private void OnDestroy()
@@ -84,7 +86,8 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        transform.position = dollyTrack.m_Waypoints[startTrackWaypointIndex].position;
+        //transform.position = dollyTrack.m_Waypoints[startTrackWaypointIndex].position;
+        
         // dollyTrack.StandardizePathDistance()
         // m_Path.StandardizeUnit(distanceAlongPath, m_PositionUnits);
         // dollyCart.m_Position  = dollyTrack. dollyTrack.m_Waypoints[startTrackWaypointIndex].position;
@@ -103,11 +106,11 @@ public class PlayerController : MonoBehaviour
         }
         
         // Play pulse
-        if (Input.GetButton("Fire1"))
+        if (Input.GetButton("Jump"))
         {
            StartPulseCharge();
         }
-        else if (Input.GetButtonUp("Fire1"))
+        else if (Input.GetButtonUp("Jump"))
         {
             PulseAttack();
         }
@@ -189,6 +192,11 @@ public class PlayerController : MonoBehaviour
     {
         isPlayerMoving = true;
         pulseAvailable = true;
+
+        _rigidbody.isKinematic = false;
+        transform.position = dollyTrack.m_Waypoints[startTrackWaypointIndex].position + transform.forward + new Vector3(0f, 0.5f, 0f);
+        dollyCart.m_Position = 0f;
+        dollyCart.transform.position = dollyTrack.m_Waypoints[startTrackWaypointIndex].position;
     }
     
     public void OnLevelCompleted()
